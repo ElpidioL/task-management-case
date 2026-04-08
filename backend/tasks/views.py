@@ -1,5 +1,7 @@
-from rest_framework import viewsets, filters, permissions
 from django.db.models import Q
+from django.utils.timezone import now
+from rest_framework import viewsets, filters, permissions, status
+from rest_framework.response import Response
 from .models import Task, Category
 from .serializers import TaskSerializer, CategorySerializer
 from .permissions import IsOwnerOrShared
@@ -43,3 +45,9 @@ class TaskViewSet(viewsets.ModelViewSet):
 
             task.completed_at = now()
             task.save()
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.is_deleted = True
+        instance.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)

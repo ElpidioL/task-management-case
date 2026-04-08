@@ -32,6 +32,12 @@ class TaskShareSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"email": "This field is required."})
         return attrs
 
+    def create(self, validated_data):
+        task = self.context.get("task")
+        if not task:
+            raise serializers.ValidationError({"task": "Task context is required."})
+        return TaskShare.objects.create(task=task, **validated_data)
+
 class TaskSerializer(serializers.ModelSerializer):
     shares = TaskShareSerializer(many=True, required=False)
     category_name = serializers.ReadOnlyField(source="category.name")
