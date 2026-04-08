@@ -10,10 +10,14 @@ from .serializers import CustomRegisterSerializer
 
 class RegisterView(generics.CreateAPIView):
     permission_classes = [permissions.AllowAny]
+    authentication_classes = []
     queryset = CustomUser.objects.all()
     serializer_class = CustomRegisterSerializer
 
 class CookieTokenObtainPairView(TokenObtainPairView):
+    permission_classes = [permissions.AllowAny]
+    authentication_classes = []
+    
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
 
@@ -38,6 +42,7 @@ class CookieTokenObtainPairView(TokenObtainPairView):
     
 class CookieTokenRefreshView(APIView):
     permission_classes = [permissions.AllowAny]
+    authentication_classes = []
 
     def post(self, request):
         refresh_token = request.COOKIES.get("refresh")
@@ -77,7 +82,7 @@ class CookieTokenRefreshView(APIView):
 
 class CookieLogoutView(APIView):
     permission_classes = [permissions.AllowAny]
-
+    authentication_classes = []
     def post(self, request):
         response = Response({"detail": "Logged out"}, status=status.HTTP_200_OK)
 
