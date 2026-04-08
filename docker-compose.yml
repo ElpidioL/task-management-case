@@ -1,0 +1,29 @@
+services:
+  backend:
+    build:
+      context: "./backend"
+      dockerfile: "Docker/application/Dockerfile"
+    ports:
+      - "8000:8000"
+    env_file:
+      - "./backend/config/.env.dev"
+    command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./media:/usr/src/app/media
+      - ./logs:/var/log
+      - ./static:/static:ro
+    restart: always
+
+  db:
+    image: postgres:15
+    container_name: postgres
+    env_file:
+      - ./.env.dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+
+volumes:
+  postgres_data:
