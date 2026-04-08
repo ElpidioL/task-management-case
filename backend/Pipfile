@@ -12,6 +12,8 @@ psycopg = "*"
 gunicorn = "*"
 django-cors-headers = "*"
 djangorestframework-simplejwt = "*"
+sentry-sdk = "*"
+drf-spectacular = "*"
 
 [dev-packages]
 
