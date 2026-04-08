@@ -27,15 +27,20 @@ services:
   nginx:
     image: nginx:latest
     restart: always
+    env_file:
+      - .env.production
     volumes:
       - ./frontend/dist:/usr/share/nginx/html:ro
       - ./media:/usr/src/app/media
       - ./static:/usr/src/app/static:ro
-      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
       - ./data/certbot/conf:/etc/letsencrypt
       - ./data/certbot/www:/var/www/certbot
-      - ./docker/nginx:/etc/nginx/conf.d:ro
-    command: "nginx -g 'daemon off;'"
+    command: >
+      /bin/sh -c "envsubst '$$API_DOMAIN'
+      < /etc/nginx/templates/default.conf.template
+      > /etc/nginx/conf.d/default.conf
+      && nginx -g 'daemon off;'"
     depends_on:
       - backend
       - frontend
