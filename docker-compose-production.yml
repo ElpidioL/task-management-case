@@ -2,7 +2,7 @@ services:
   backend:
     build:
       context: "./backend"
-      dockerfile: "docker/application/Dockerfile"
+      dockerfile: "Docker/application/Dockerfile"
     env_file:
       - "./backend/config/.env.production"
     command: bash -c "python manage.py migrate && gunicorn config.wsgi -b 0.0.0.0:8000 -w 4 --log-level debug --capture-output --access-logfile /var/log/gunicorn_access.log --error-logfile /var/log/gunicorn_error.log"
@@ -15,13 +15,14 @@ services:
     restart: always
 
   frontend:
-    build:
-      context: ./frontend
+    image: node:20-alpine
+    working_dir: /app
     volumes:
+      - ./frontend:/app
       - ./frontend/dist:/app/dist
     env_file:
       - ./frontend/.env.production
-    command: npm run build
+    command: sh -c "npm ci && npm run build"
     restart: "no"
 
   nginx:
