@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError
 from datetime import datetime, timedelta
+from django.utils import timezone
 
 from tasks.models import Category, Task, TaskShare
 
@@ -45,7 +46,7 @@ def test_task_creation(user, category):
         title="Finish report",
         owner=user,
         category=category,
-        due_date=datetime.now() + timedelta(days=1)
+        due_date=timezone.now() + timedelta(days=1)
     )
     assert task.title == "Finish report"
     assert task.owner == user

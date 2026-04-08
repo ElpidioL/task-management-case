@@ -1,0 +1,38 @@
+name: Backend Tests
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+    env:
+      PIPENV_VENV_IN_PROJECT: 1
+      CI: "True"
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Pipenv
+        run: pip install pipenv
+
+      - name: Install dependencies
+        run: pipenv install --dev --deploy --ignore-pipfile
+
+      - name: Run pytest
+        env:
+          PRODUCTION: "False"
+          CI: "True"
+        run: pipenv run pytest -q

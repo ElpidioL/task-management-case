@@ -2,6 +2,7 @@ import pytest
 from rest_framework.serializers import ValidationError
 from django.contrib.auth import get_user_model
 from datetime import datetime, timedelta
+from django.utils import timezone
 
 from tasks.models import Category, Task, TaskShare
 from tasks.serializers import CategorySerializer, TaskSerializer, TaskShareSerializer
@@ -67,7 +68,7 @@ def test_task_serializer_creation_with_shares(user, another_user, db):
         "shares": [
             {"email": another_user.email, "can_edit": True}
         ],
-        "due_date": (datetime.now() + timedelta(days=1)).isoformat()
+        "due_date": (timezone.now() + timedelta(days=1)).isoformat()
     }
 
     serializer = TaskSerializer(data=data)
