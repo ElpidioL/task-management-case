@@ -6,6 +6,7 @@ from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.chrome.service import Service
 
 
 BASE_URL = os.getenv("FRONTEND_URL", "http://127.0.0.1:5173")
@@ -18,8 +19,15 @@ class FrontendSeleniumSmokeTest(unittest.TestCase):
             options = webdriver.ChromeOptions()
             options.add_argument("--headless=new")
             options.add_argument("--window-size=1366,900")
-            cls.driver = webdriver.Chrome(options=options)
+
+            options.add_argument("--no-sandbox")
+            options.add_argument("--disable-dev-shm-usage")
+            options.add_argument("--disable-gpu")
+
+            service = Service()
+            cls.driver = webdriver.Chrome(service=service, options=options)
             cls.wait = WebDriverWait(cls.driver, 10)
+
         except WebDriverException as exc:
             raise unittest.SkipTest(f"Selenium/WebDriver indisponivel: {exc}")
 
