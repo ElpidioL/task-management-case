@@ -74,6 +74,36 @@ class CookieTokenRefreshView(APIView):
 
         return response
 
+
+class CookieLogoutView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        response = Response({"detail": "Logged out"}, status=status.HTTP_200_OK)
+
+        response.set_cookie(
+            "access",
+            "",
+            max_age=0,
+            expires="Thu, 01 Jan 1970 00:00:00 GMT",
+            path="/",
+            httponly=True,
+            secure=settings.PRODUCTION,
+            samesite="Lax",
+        )
+        response.set_cookie(
+            "refresh",
+            "",
+            max_age=0,
+            expires="Thu, 01 Jan 1970 00:00:00 GMT",
+            path="/",
+            httponly=True,
+            secure=settings.PRODUCTION,
+            samesite="Lax",
+        )
+        return response
+
+
 class CurrentUserView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
