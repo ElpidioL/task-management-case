@@ -1,10 +1,11 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.contrib.auth.decorators import user_passes_test
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from django.conf import settings
 
 urlpatterns = [
+    path("api/", include("accounts.urls")),
 ]
 
 if not settings.PRODUCTION:
