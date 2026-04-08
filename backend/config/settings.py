@@ -27,7 +27,7 @@ if PRODUCTION:
     CORS_ORIGIN_ALLOW_ALL = False
     CSRF_TRUSTED_ORIGINS = []
 else:
-    CORS_ALLOWED_ORIGIN_REGEXES = [r'^http://localhost:\d+$']
+    CORS_ALLOWED_ORIGIN_REGEXES = ['*']
     CORS_ORIGIN_ALLOW_ALL = True
 
 if PRODUCTION:
@@ -50,15 +50,18 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # my apps
+    'accounts',
 
     # third-party
     'rest_framework',
-    'rest_framework_simplejwt.token_blacklist',
+    'rest_framework.authtoken',
+    'rest_framework_simplejwt',
     'corsheaders',
     'drf_spectacular',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -103,7 +106,6 @@ DATABASES = {
 }
 
 
-
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
@@ -124,7 +126,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'config.authentication.CookieJWTAuthentication', 
+        #'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
@@ -133,6 +136,8 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
+    'SIGNING_KEY': SECRET_KEY,
+    'ALGORITHM': 'HS256',
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'AUTH_HEADER_TYPES': ('Bearer',),
@@ -164,3 +169,5 @@ if PRODUCTION:
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = '/admin/login/'
+
+AUTH_USER_MODEL = 'accounts.CustomUser'
