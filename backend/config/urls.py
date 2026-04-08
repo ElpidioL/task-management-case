@@ -6,6 +6,7 @@ from django.conf import settings
 
 urlpatterns = [
     path("api/", include("accounts.urls")),
+    path("api/", include("tasks.urls")),
 ]
 
 if not settings.PRODUCTION:
