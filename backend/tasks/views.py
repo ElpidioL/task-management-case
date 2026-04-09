@@ -29,9 +29,37 @@ class TaskViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
 
-        return Task.objects.filter(
+        qs = Task.objects.filter(
             Q(owner=user) | Q(shares__user=user)
         ).distinct()
+
+        status_filter = self.request.query_params.get("status", "").strip().lower()
+        if status_filter == "completed":
+            qs = qs.filter(is_completed=True)
+        elif status_filter == "pending":
+            qs = qs.filter(is_completed=False)
+
+        scope_filter = self.request.query_params.get("scope", "").strip().lower()
+        if scope_filter == "mine":
+            qs = qs.filter(owner=user)
+        elif scope_filter == "shared":
+            qs = qs.filter(shares__user=user).exclude(owner=user)
+
+        category_id = self.request.query_params.get("category", "").strip()
+        if category_id and category_id.lower() != "all":
+            qs = qs.filter(category_id=category_id)
+
+        due_filter = self.request.query_params.get("due", "").strip().lower()
+        if due_filter == "no_due":
+            qs = qs.filter(due_date__isnull=True)
+        elif due_filter == "has_due":
+            qs = qs.filter(due_date__isnull=False)
+        elif due_filter == "due_today":
+            qs = qs.filter(due_date__date=now().date())
+        elif due_filter == "overdue":
+            qs = qs.filter(due_date__lt=now(), is_completed=False)
+
+        return qs
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)

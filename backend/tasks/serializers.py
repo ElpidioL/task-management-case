@@ -41,6 +41,7 @@ class TaskShareSerializer(serializers.ModelSerializer):
 class TaskSerializer(serializers.ModelSerializer):
     shares = TaskShareSerializer(many=True, required=False)
     category_name = serializers.ReadOnlyField(source="category.name")
+    category_color = serializers.ReadOnlyField(source="category.color")
     owner_email = serializers.ReadOnlyField(source="owner.email")
 
     class Meta:
@@ -53,6 +54,7 @@ class TaskSerializer(serializers.ModelSerializer):
             "owner_email",
             "category",
             "category_name",
+            "category_color",
             "is_completed",
             "due_date",
             "completed_by",
