@@ -61,7 +61,7 @@ class Task(models.Model):
         related_name="owned_tasks"
     )
 
-    category = models.ForeignKey(
+    category = models.ForeignKey( # We could change to many categories.
         Category,
         on_delete=models.SET_NULL,
         null=True,
@@ -99,7 +99,7 @@ class Task(models.Model):
     all_objects = models.Manager()
 
     class Meta:
-        ordering = ["-due_date", "-created_at"]
+        ordering = ["due_date", "-created_at"]
 
 
     def __str__(self):
