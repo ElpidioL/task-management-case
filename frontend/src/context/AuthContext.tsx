@@ -68,8 +68,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const currentUser = await getCurrentUser();
       setUser(currentUser);
       setAuthMessage("Account created and logged in.");
-    } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : "Authentication failed");
+
+    } catch (error: any) {
+      let message = "Authentication failed";
+      if (error instanceof Error) {
+
+        try {
+          const parsed = JSON.parse(error.message);
+
+          if (typeof parsed === "object" && parsed !== null) {
+            const messages = Object.values(parsed).flat().filter(Boolean);
+
+            if (messages.length > 0) {
+              message = messages.join(" ");
+            } else {
+              message = error.message;
+            }
+          } else {
+            message = error.message;
+          }
+
+        } catch {
+          message = error.message;
+        }
+      }
+
+      setErrorMessage(message);
+
     } finally {
       setAuthLoading(false);
     }
