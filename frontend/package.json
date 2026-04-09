@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-     "test:selenium": "pipenv run python tests/test_selenium_smoke.py"
+    "test:selenium": "pipenv run python tests/test_selenium_smoke.py"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.96.2",

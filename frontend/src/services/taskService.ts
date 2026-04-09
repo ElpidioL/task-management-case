@@ -5,13 +5,29 @@ import { apiRequest } from "./apiClient";
 export type TaskQuery = {
   page: number;
   search: string;
+  status?: "all" | "pending" | "completed";
+  scope?: "all" | "mine" | "shared";
+  category?: string;
+  due?: "all" | "no_due" | "has_due" | "due_today" | "overdue";
 };
 
-export async function fetchTasks({ page, search }: TaskQuery) {
+export async function fetchTasks({ page, search, status, scope, category, due }: TaskQuery) {
   const params = new URLSearchParams();
   params.set("page", String(page));
   if (search.trim()) {
     params.set("search", search.trim());
+  }
+  if (status && status !== "all") {
+    params.set("status", status);
+  }
+  if (scope && scope !== "all") {
+    params.set("scope", scope);
+  }
+  if (category && category !== "all") {
+    params.set("category", category);
+  }
+  if (due && due !== "all") {
+    params.set("due", due);
   }
   return apiRequest<PaginatedTasks>(`/api/tasks/?${params.toString()}`);
 }
