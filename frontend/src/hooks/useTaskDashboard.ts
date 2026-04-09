@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { createCategory, fetchCategories } from "../services/categoryService";
@@ -19,13 +19,11 @@ import {
   type TaskFormState,
   type TaskScopeFilter,
   type TaskStatusFilter,
-  isDueDateOverdue,
-  isDueDateToday,
 } from "../types/task";
 
 const PAGE_SIZE = 10;
 
-export function useTaskDashboard(currentUserId: string) {
+export function useTaskDashboard() {
   const queryClient = useQueryClient();
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -36,6 +34,10 @@ export function useTaskDashboard(currentUserId: string) {
   const [dueDateFilter, setDueDateFilter] = useState<TaskDueDateFilter>("all");
   const [page, setPage] = useState(1);
 
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm, statusFilter, categoryFilter, scopeFilter, dueDateFilter]);
+  
   const { data: categoriesData, isLoading: categoriesLoading } = useQuery<PaginatedCategories>({
     queryKey: ["categories"],
     queryFn: fetchCategories,
@@ -44,33 +46,21 @@ export function useTaskDashboard(currentUserId: string) {
   const categories: Category[] = categoriesData?.results ?? [];
 
   const { data: tasksData, isLoading: tasksLoading } = useQuery<PaginatedTasks>({
-    queryKey: ["tasks", page, searchTerm],
-    queryFn: () => fetchTasks({ page, search: searchTerm }),
+    queryKey: ["tasks", page, searchTerm, statusFilter, categoryFilter, scopeFilter, dueDateFilter],
+    queryFn: () =>
+      fetchTasks({
+        page,
+        search: searchTerm,
+        status: statusFilter,
+        scope: scopeFilter,
+        category: categoryFilter,
+        due: dueDateFilter,
+      }),
   });
-
-  const rawTasks = tasksData?.results ?? [];
+  const tasks = tasksData?.results ?? [];
   const totalCount = tasksData?.count ?? 0;
-
-  const tasks = useMemo(() => {
-    return rawTasks.filter((task) => {
-      if (statusFilter === "pending" && task.is_completed) return false;
-      if (statusFilter === "completed" && !task.is_completed) return false;
-      if (categoryFilter !== "all" && task.category !== categoryFilter) return false;
-      if (scopeFilter === "mine" && task.owner !== currentUserId) return false;
-      if (scopeFilter === "shared" && task.owner === currentUserId) return false;
-
-      if (dueDateFilter === "no_due" && task.due_date) return false;
-      if (dueDateFilter === "has_due" && !task.due_date) return false;
-      if (dueDateFilter === "due_today") {
-        if (!task.due_date || !isDueDateToday(task.due_date)) return false;
-      }
-      if (dueDateFilter === "overdue") {
-        if (!task.due_date || !isDueDateOverdue(task.due_date, task.is_completed)) return false;
-      }
-
-      return true;
-    });
-  }, [rawTasks, statusFilter, categoryFilter, scopeFilter, dueDateFilter, currentUserId]);
+  
+  const stableTasks = useMemo(() => tasks, [tasks]);
 
   const totalPages = useMemo(() => {
     if (totalCount === 0) return 1;
@@ -123,7 +113,7 @@ export function useTaskDashboard(currentUserId: string) {
   }
 
   return {
-    tasks,
+    tasks: stableTasks,
     categories,
     tasksLoading,
     categoriesLoading,

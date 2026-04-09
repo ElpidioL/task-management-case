@@ -28,7 +28,7 @@ export function TasksRoutePage() {
     saveCategory,
     handleToggleTaskCompletion,
     handleDeleteTask,
-  } = useTaskDashboard(user?.id ?? "");
+  } = useTaskDashboard();
 
   if (!user) return null;
 

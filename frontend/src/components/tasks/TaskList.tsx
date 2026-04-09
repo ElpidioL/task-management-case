@@ -55,7 +55,7 @@ export function TaskList({
                   <span
                     className="category-pill"
                     style={{
-                      backgroundColor: categoryColors[task.category!] ?? "#d1d5db",
+                      backgroundColor: categoryColors[task.category!] ?? task.category_color ?? "#d1d5db",
                     }}
                   />
                   <small>{task.category_name ?? "Category"}</small>

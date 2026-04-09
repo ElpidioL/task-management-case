@@ -26,6 +26,7 @@ export type Task = {
   owner_email?: string;
   category: string | null;
   category_name?: string;
+  category_color?: string;
   is_completed: boolean;
   due_date: string | null;
   shares: TaskShare[];
